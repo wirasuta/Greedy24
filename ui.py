@@ -13,12 +13,12 @@ rectangle_draging = False
 class CardSprite(pygame.sprite.Sprite):
     def __init__(self,val,sym):
         pygame.sprite.Sprite.__init__(self)
-        self.image=pygame.image.load("img/JPEG/%s%s.jpg" % (val,sym)).convert()
+        self.image=pygame.image.load("img/JPEG/%s%s.png" % (val,sym)).convert()
         self.image = pygame.transform.scale(self.image, (160, 220))
         self.rect=self.image.get_rect()
         self.rect.x = 680
         self.rect.y = 460
-        print ("img/JPEG/%s%s.jpg" % (val,sym))
+        print ("img/JPEG/%s%s.png" % (val,sym))
 
 
 
@@ -26,7 +26,7 @@ class DeckSprite(pygame.sprite.Sprite):
  def __init__(self):
     pygame.sprite.Sprite.__init__(self)
     #Get Deck Image
-    self.image=pygame.image.load("img/JPEG/Gray_back.jpg").convert()
+    self.image=pygame.image.load("img/JPEG/gray_back.png").convert()
     self.image = pygame.transform.scale(self.image, (160, 220))
     self.rect=self.image.get_rect()
     self.rect.x = 680
