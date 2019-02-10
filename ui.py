@@ -1,12 +1,13 @@
 import pygame
 from DeckOfCards import DeckOfCards
-#Initilize Global Game Variables
+from solve import solve
+# --------------------------------
+# Initilize UI Variables and Fonts
+# --------------------------------
 pygame.init()
 bgcolor = (60, 142, 83)
 screen = pygame.display.set_mode((900, 700))
-done = False
-clock = pygame.time.Clock()
-rectangle_draging = False
+
 
 # Fonts and Texts
 pygame.font.init() # you have to call this at the start, 
@@ -15,12 +16,11 @@ Credfont = pygame.font.SysFont('lobster14', 30)
 Textfont = pygame.font.SysFont('dejavuserif',20, True)
 Title = Titlefont.render('24 Cards The Game', False, (0, 0, 0))
 Creds =Credfont.render('By Garda, Dika, Tude', False, (0, 0, 0))
-Points = Textfont.render('Points : ', False, (0, 0, 0))
 Reset = Credfont.render('Reset',False,(0,0,0))
-Expr = Credfont.render('Optimal Expression : ',False,(0,0,0))
 
-Button = pygame.rect.Rect(60,600,100,60)
-
+# -------------------
+# Create Game Objects
+# -------------------
 
 class CardSprite(pygame.sprite.Sprite):
     def __init__(self,val,sym):
@@ -45,24 +45,40 @@ class DeckSprite(pygame.sprite.Sprite):
     self.rect.x = 680
     self.rect.y = 460
 
-mylist = pygame.font.get_fonts()
-print(mylist)
+# ----------------------------------- 
+# Initiate Game objects and variables
+# -----------------------------------
 
+done = False
+clock = pygame.time.Clock()
+rectangle_draging = False
 deck = DeckOfCards()
 decksp = DeckSprite()
 deckBox = decksp.rect
 cardGroup = pygame.sprite.Group()
 cardList = []
+values = []
 remaining = 52
 ncards = 0
+Button = pygame.rect.Rect(60,600,100,60)
+solved = False
+pointNum= 0
+expression = ""
+currentCard = None
 
 CardBox = []
 CardBox.append(pygame.draw.rect(screen, (0,0,0), pygame.Rect(60, 190, 160,220), 2))
 CardBox.append(pygame.draw.rect(screen, (0,0,0), pygame.Rect(270, 190, 160,220), 2))
 CardBox.append(pygame.draw.rect(screen, (0,0,0), pygame.Rect(470, 190, 160,220), 2))
 CardBox.append(pygame.draw.rect(screen, (0,0,0), pygame.Rect(680, 190, 160,220), 2))
-
 isEmpty = [True,True,True,True]
+
+
+
+# ------------
+# UI Functions
+# ------------
+
 def drawScreen() :
     #Title Box
     # pygame.draw.rect(screen, (0,0,0), pygame.Rect(10, 10, 880,140), 2)
@@ -91,13 +107,18 @@ def drawScreen() :
     cardGroup.draw(screen)
 
 
-def reset(n) :
+def reset(n) : 
+    global ncards, isEmpty, expression, pointNum, values
     if n ==1 :
         remaining = 52
         ncards = 0
         deck = DeckOfCards()
     if n == 0 :
         ncards = 0
+        isEmpty = [True for _ in range(4)]
+        expression = ""
+        pointNum = 0
+        values = []
 
 while not done:
         for event in pygame.event.get():
@@ -112,10 +133,20 @@ while not done:
                                 newSprite = CardSprite(newcard.getValue(),newcard.getSymbol())
                                 cardGroup.add(newSprite)
                                 cardList.append(newSprite)
+                                if (newcard.index == 1) :
+                                    values.append(1)
+                                else :
+                                    values.append(newcard.index)
+
+                                
                                 ncards = ncards+1
                                 remaining = remaining - 1
                                 # print(newcard.getValue())
                                 # print(newcard.getSymbol())
+                        elif Button.collidepoint(event.pos) : 
+                            reset(0)
+                            cardGroup.remove([obj for obj in cardGroup ])
+                            cardList = []
 
                         for Card in cardList :
                             if Card.rect.collidepoint(event.pos) :
@@ -155,31 +186,20 @@ while not done:
                         currentCard.y = mouse_y + offset_y
 
 
-
-
+        if all([c == False for c in isEmpty]) :
+            if (solved == False) :
+                result = solve([values[0],values[1],values[2],values[3]])
+                pointNum = result[1]
+                expression = result[0]
+                solved == True
             
         screen.fill(bgcolor)
         #Update remaining 
         Remainder = Textfont.render('Remaining Cards : %s' % (remaining), False, (0, 0, 0))
-
+        Expr = Credfont.render('Optimal Expression : %s' % (expression),False,(0,0,0))
+        Points = Textfont.render('Points : %.2f' % (pointNum), False, (0, 0, 0))
         drawScreen()
 
-        
-
-        #         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-        #             is_blue = not is_blue
-        #
-        # isPressed = pygame.key.get_pressed()
-        # if isPressed[pygame.K_UP] : y -= 3
-        # if isPressed[pygame.K_DOWN] : y += 3
-        # if isPressed[pygame.K_LEFT] : x -= 3
-        # if isPressed[pygame.K_RIGHT] : x += 3
-        #
-        #
-        #
-        # if is_blue: color = (0, 128, 255)
-        # else: color = (255, 100, 0)
-        # screen.fill((0, 0, 0))
 
         pygame.display.flip()
         clock.tick(30)
