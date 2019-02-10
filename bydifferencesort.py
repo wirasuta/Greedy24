@@ -61,11 +61,14 @@ def main():
                         print(f"{(a-1)*13*13*13+(b-1)*13*13+(c-1)*13+d} : {expre}")
 
     avg_points = points/(13**4)
-    solves.sort(key=lambda x: x[1],reverse=True)
-    print("Worst cases:")
-    pprint(solves[-300:])
     print(f"Average points : {avg_points}")
-    print(f"Total points : {points}")
+
+    count24 = 0
+    for expr in solves:
+        res = eval(expr[0])
+        if res==24:
+            count24 += 1
+    print(f"24 Count : {count24}")
 
 if __name__ == "__main__":
     main()

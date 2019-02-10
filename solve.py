@@ -8,7 +8,7 @@ points_dict = {
 
 op_list = ['+','-','*','/']
 
-def fitness(x1,op,x2):
+def point_op(x1,op,x2):
     #Mengembalikan point dari penyambungan expresi dengan operasi dan bilangan berikutnya
     try:
         hasil = eval(f"{x1} {op} {x2}")
@@ -20,7 +20,8 @@ def fitness(x1,op,x2):
     except ZeroDivisionError:
         return float("-inf")
 
-def calc_points(expr):
+def point_expr(expr):
+    #Mengembalikan point dari sebuah expresi
     points = 0
     hasil = eval(expr)
     points -= abs(24-hasil)
@@ -28,24 +29,32 @@ def calc_points(expr):
         points += points_dict.get(c,0)
     return points
 
+def max(list):
+    #Mengembalikan nilai maksimal dari sebuah array
+    #Prekondisi : Array minimal satu elemen
+    maxb = list[0]
+    for b in list[1:]:
+        if b>maxb:
+            maxb = b
+    return maxb
+
 def solve(bil):
-    bil.sort(reverse=True)
-
-    expr = str(bil[0])
-    bil = bil[1:]
+    maxb = max(bil)
+    expr = str(maxb)
+    bil.remove(maxb)
     for _ in range(3):
-        b_max_fitness = float("-Inf")
-        for b in bil:
-            for op in op_list:
-                curr_fitness = fitness(expr,op,b)
-                if curr_fitness > b_max_fitness:
-                    b_max_fitness = curr_fitness
-                    curr_op_max = op
-                    curr_b_max = b
+        b = max(bil)
+        bil.remove(b)
+        max_point = float("-inf")
+        for op in op_list:
+            curr_point = point_op(expr,op,b)
+            if curr_point > max_point:
+                max_point = curr_point
+                curr_op_max = op
+                curr_b_max = b
         expr += f" {curr_op_max} {curr_b_max}"
-        bil.remove(curr_b_max)
 
-    points = calc_points(expr)
+    points = point_expr(expr)
     # print(f"{expr} ~ Points: {points}")
     return (expr,points)
 
@@ -73,6 +82,7 @@ def main():
         if res==24:
             count24 += 1
     print(f"24 Count : {count24}")
+    
 
 if __name__ == "__main__":
     main()
