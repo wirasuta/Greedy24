@@ -8,12 +8,6 @@ done = False
 clock = pygame.time.Clock()
 rectangle_draging = False
 
-#Title
-basicfont = pygame.font.SysFont(None, 48)
-text = basicfont.render('Hello World!', True, (255, 0, 0), (255, 255, 255))
-textrect = text.get_rect()
-textrect.centerx = screen.get_rect().centerx
-textrect.centery = screen.get_rect().centery
 
 
 class CardSprite(pygame.sprite.Sprite):
