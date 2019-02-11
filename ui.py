@@ -16,11 +16,11 @@ Credfont = pygame.font.SysFont('lobster14', 30)
 Textfont = pygame.font.SysFont('dejavuserif',20, True)
 Title = Titlefont.render('24 Cards The Game', False, (0, 0, 0))
 Creds =Credfont.render('By Garda, Dika, Tude', False, (0, 0, 0))
-Reset = Credfont.render('Reset',False,(0,0,0))
+Reset = Credfont.render('Clear',False,(0,0,0))
 
-# -------------------
-# Create Game Objects
-# -------------------
+# --------------------------
+# Create Game Object Classes
+# --------------------------
 
 class CardSprite(pygame.sprite.Sprite):
     def __init__(self,val,sym):
@@ -30,7 +30,8 @@ class CardSprite(pygame.sprite.Sprite):
         self.rect=self.image.get_rect()
         self.rect.x = 680
         self.rect.y = 460
-        print ("img/JPEG/%s%s.png" % (val,sym))
+        self.isPlaced = False
+        print ("You have just taken %s%s" % (val,sym))
 
 
 
@@ -44,6 +45,7 @@ class DeckSprite(pygame.sprite.Sprite):
     self.rect=self.image.get_rect()
     self.rect.x = 680
     self.rect.y = 460
+    
 
 # ----------------------------------- 
 # Initiate Game objects and variables
@@ -108,7 +110,7 @@ def drawScreen() :
 
 
 def reset(n) : 
-    global ncards, isEmpty, expression, pointNum, values
+    global ncards, isEmpty, expression, pointNum, values, currentCard
     if n ==1 :
         remaining = 52
         ncards = 0
@@ -119,11 +121,16 @@ def reset(n) :
         expression = ""
         pointNum = 0
         values = []
+        currentCard = None
 
 while not done:
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                         done = True
+
+                elif remaining == 0 :
+                    print("Thank You for Playing 24 Cards The Game!")
+                    done = True
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
@@ -149,8 +156,9 @@ while not done:
                             cardList = []
 
                         for Card in cardList :
-                            if Card.rect.collidepoint(event.pos) :
+                            if (Card.rect.collidepoint(event.pos) and Card.isPlaced == False):
                                 currentCard = Card.rect
+                                currentCardObj = Card
                                 rectangle_draging = True
                                 mouse_x, mouse_y = event.pos
                                 offset_x = currentCard.x - mouse_x
@@ -163,18 +171,26 @@ while not done:
                                 currentCard.x = 60
                                 currentCard.y = 190
                                 isEmpty[0] = False
+                                currentCardObj.isPlaced = True
+                                # print("isPlaced is now %s" % currentCardObj.isPlaced)
                             elif (currentCard.colliderect(CardBox[1]) and isEmpty[1]) :
                                 currentCard.x = 270
                                 currentCard.y = 190
                                 isEmpty[1] = False
+                                currentCardObj.isPlaced = True
+                                # print("isPlaced is now %s" % currentCardObj.isPlaced)
                             elif (currentCard.colliderect(CardBox[2]) and isEmpty[2]) :
                                 currentCard.x = 470
                                 currentCard.y = 190
-                                isEmpty[2] = False                         
+                                isEmpty[2] = False             
+                                currentCardObj.isPlaced = True            
+                                # print("isPlaced is now %s" % currentCardObj.isPlaced)
                             elif (currentCard.colliderect(CardBox[3]) and isEmpty[3]) :
                                 currentCard.x = 680
                                 currentCard.y = 190
                                 isEmpty[3] = False
+                                currentCardObj.isPlaced = True
+                                # print("isPlaced is now %s" % currentCardObj.isPlaced)
 
                         currentCard = None
                         rectangle_draging = False
@@ -186,8 +202,7 @@ while not done:
                         currentCard.y = mouse_y + offset_y
 
 
-        if all([c == False for c in isEmpty]) :
-            if (solved == False) :
+        if all([c == False for c in isEmpty]) and (solved == False) :
                 result = solve([values[0],values[1],values[2],values[3]])
                 pointNum = result[1]
                 expression = result[0]
